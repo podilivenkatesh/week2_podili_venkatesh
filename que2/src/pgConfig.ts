@@ -1,12 +1,13 @@
-import { Pool, QueryResult } from 'pg';
+import { Pool } from 'pg';
 
-// Set up the PostgreSQL connection pool
-const pool = new Pool({
+const pgConfig = {
     user: 'postgres',
     host: 'localhost',
     database: 'postgres1',
     password: 'Venky@15',
     port: 5432,
-});
+};
+
+const pool = new Pool(pgConfig);
 
 export default pool;

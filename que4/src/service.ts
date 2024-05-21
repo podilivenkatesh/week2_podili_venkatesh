@@ -1,19 +1,42 @@
-// logic.ts
-import { Student } from './pgConfig';
+import pool from './pgConfig'; 
 
-export async function filterPassedStudents(students: Student[]): Promise<Student[]> {
-    return students.filter(student => student.grade >= 50);
-}
+// Create student details
+async function createStudent(name: string, age: number, grade: number): Promise<any> { 
+ try { 
+ const query = 'INSERT INTO students (name, age, grade) VALUES ($1, $2, $3)'; 
+ const result = await pool.query(query, [name, age, grade]);
+ return result; 
+ } catch(err) { 
+ return err; 
+ } 
+} 
 
-export async function getStudentNames(students: Student[]): Promise<string[]> {
-    return students.map(student => student.name);
-}
+// Get all student names
+async function getStudentNames(): Promise<any[]> { 
+ const query = 'SELECT name FROM students'; 
+ const result = await pool.query(query); 
+ return result.rows; 
+} 
 
-export async function sortStudentsByGrade(students: Student[]): Promise<Student[]> {
-    return students.slice().sort((a, b) => a.grade - b.grade);
-}
+// Filter students whose grade is greater than or equal to 50
+async function filterPassedStudents(): Promise<any> { 
+ const query = 'SELECT * FROM students WHERE grade >= 50';
+ const result = await pool.query(query); 
+ return result.rows; 
+} 
 
-export async function getAverageAge(students: Student[]): Promise<number> {
-    const totalAge = students.reduce((acc, student) => acc + student.age, 0);
-    return totalAge / students.length;
-}
+// Sort students by grade in ascending order
+async function sortStudentsByGrade(): Promise<any> { 
+ const query = 'SELECT * FROM students ORDER BY grade ASC'; 
+ const result = await pool.query(query); 
+ return result.rows; 
+} 
+
+// Get the average age of students
+async function getAverageAge(): Promise<any> { 
+ const query = 'SELECT AVG(age) AS average_age FROM students'; 
+ const result = await pool.query(query); 
+ return result.rows[0].average_age; 
+} 
+
+export { createStudent, getStudentNames, filterPassedStudents, sortStudentsByGrade, getAverageAge };

@@ -12,72 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// app.ts
 const express_1 = __importDefault(require("express"));
-const pgConfig_1 = require("./pgConfig");
 const service_1 = require("./service");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.get('/passed-students', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint to create a new student
+app.post('/students', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, age, grade } = req.body;
     try {
-        const students = yield (0, pgConfig_1.fetchStudents)();
-        const passedStudents = yield (0, service_1.filterPassedStudents)(students);
-        res.json(passedStudents);
+        yield (0, service_1.createStudent)(name, age, grade);
+        res.send("Student created successfully");
     }
-    catch (error) {
-        console.error('Error filtering passed students:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    catch (err) {
+        res.status(500).send("Error creating student");
     }
 }));
-app.get('/student-names', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint to get all student names
+app.get('/students/names', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const students = yield (0, pgConfig_1.fetchStudents)();
-        const studentNames = yield (0, service_1.getStudentNames)(students);
-        res.json(studentNames);
+        const names = yield (0, service_1.getStudentNames)();
+        res.json(names);
     }
-    catch (error) {
-        console.error('Error getting student names:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    catch (err) {
+        res.status(500).send("Error fetching student names");
     }
 }));
-app.get('/students-sorted-by-grade', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint to get students with grades >= 50
+app.get('/students/passed', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const students = yield (0, pgConfig_1.fetchStudents)();
-        const sortedStudents = yield (0, service_1.sortStudentsByGrade)(students);
-        res.json(sortedStudents);
+        const students = yield (0, service_1.filterPassedStudents)();
+        res.json(students);
     }
-    catch (error) {
-        console.error('Error sorting students by grade:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    catch (err) {
+        res.status(500).send("Error fetching passed students");
     }
 }));
-app.get('/average-age', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint to get students sorted by grade
+app.get('/students/sorted', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const students = yield (0, pgConfig_1.fetchStudents)();
-        const averageAge = yield (0, service_1.getAverageAge)(students);
-        res.json({ averageAge });
+        const students = yield (0, service_1.sortStudentsByGrade)();
+        res.json(students);
     }
-    catch (error) {
-        console.error('Error calculating average age:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    catch (err) {
+        res.status(500).send("Error fetching sorted students");
     }
 }));
-// Add a new POST endpoint to accept JSON data from Postman
-app.post('/new-student', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint to get the average age of students
+app.get('/students/average-age', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Assuming the request body contains JSON data for a new student
-        const newStudent = req.body;
-        // Here you can perform any operations with the new student data, such as adding it to the database
-        // For demonstration, let's just echo back the received data
-        res.json(newStudent);
+        const averageAge = yield (0, service_1.getAverageAge)();
+        res.json({ average_age: averageAge });
     }
-    catch (error) {
-        console.error('Error processing new student data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    catch (err) {
+        res.status(500).send("Error fetching average age");
     }
 }));
 // Start the server
 app.listen(3000, () => {
-    console.log(`Server is running on port`);
+    console.log(`Server is running on port 3000`);
 });
 //# sourceMappingURL=app.js.map
